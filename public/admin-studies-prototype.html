@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Studies</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .stat-badge { @apply inline-flex items-center px-2 py-1 rounded text-xs font-medium; }
+        .action-btn { @apply p-1.5 hover:bg-gray-100 rounded transition-colors cursor-pointer; }
+        .stats-card { @apply bg-white rounded-lg border p-6 hover:shadow-md transition-shadow; }
+        .table-row-hover { @apply hover:bg-gray-50 transition-colors; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b sticky top-0 z-50">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-semibold">All Studies</h1>
+                    <span class="text-sm text-gray-500">Admin View</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Export All
+                    </button>
+                    <button class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                        Configure
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="stats-card">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i>
+                    <span class="text-xs text-gray-500">+12.5%</span>
+                </div>
+                <div class="text-2xl font-bold">2,847</div>
+                <div class="text-sm text-gray-600">Total Studies</div>
+                <div class="text-xs text-gray-500 mt-1">All time</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="calendar" class="w-5 h-5 text-green-600"></i>
+                    <span class="text-xs text-green-600">+8.2%</span>
+                </div>
+                <div class="text-2xl font-bold">156</div>
+                <div class="text-sm text-gray-600">This Week</div>
+                <div class="text-xs text-gray-500 mt-1">Studies assigned</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="clock" class="w-5 h-5 text-orange-600"></i>
+                    <span class="text-xs text-orange-600">7 urgent</span>
+                </div>
+                <div class="text-2xl font-bold">23</div>
+                <div class="text-sm text-gray-600">Pending Review</div>
+                <div class="text-xs text-gray-500 mt-1">Awaiting review</div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                    <span class="text-xs text-gray-500">98.2% TAT</span>
+                </div>
+                <div class="text-2xl font-bold">2,668</div>
+                <div class="text-sm text-gray-600">Completed</div>
+                <div class="text-xs text-gray-500 mt-1">Finalized</div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-lg border p-4 mb-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="flex-1">
+                    <div class="relative">
+                        <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" placeholder="Search patient, study, modality..." 
+                               class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>All Organizations</option>
+                    <option>City Medical Center</option>
+                    <option>County Hospital</option>
+                    <option>Rural Clinic</option>
+                    <option>Metro Health</option>
+                </select>
+                
+                <select class="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option>All Priorities</option>
+                    <option>STAT</option>
+                    <option>Urgent</option>
+                    <option>Routine</option>
+                </select>
+                
+                <button class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                    Last 24h
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </button>
+                
+                <button class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                    <i data-lucide="filter" class="w-4 h-4"></i>
+                    More Filters
+                </button>
+            </div>
+            
+            <!-- Quick Filter Pills -->
+            <div class="flex items-center gap-2">
+                <button class="px-3 py-1.5 bg-gray-900 text-white rounded-full text-sm">All</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200">Completed</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200">In Review</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200">Error</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200">Billing Pending</button>
+                <button class="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200">Compliance Flag</button>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Bar (hidden by default) -->
+        <div id="bulkActions" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-blue-900">
+                        <span id="selectedCount">0</span> studies selected
+                    </span>
+                    <button class="text-sm text-blue-600 hover:text-blue-700">Select all 156</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Reassign Radiologist
+                    </button>
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Update Status
+                    </button>
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Export Selected
+                    </button>
+                    <button class="px-3 py-1.5 bg-red-600 text-white rounded text-sm hover:bg-red-700">
+                        Archive
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="p-4 text-left">
+                                <input type="checkbox" id="selectAll" class="rounded">
+                            </th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Actions</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Request Date</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Study Date</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Last</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">First</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">MRN#</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Accession #</th>
+                            <th class="p-4 text-center text-xs font-medium text-gray-700 uppercase"># Images</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Study</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Radiologist</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Hospital</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Organization</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Billing</th>
+                            <th class="p-4 text-left text-xs font-medium text-gray-700 uppercase">Compliance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studiesTableBody">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="border-t px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        Showing 1 to 10 of 156 results
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            Previous
+                        </button>
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded">1</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">3</button>
+                        <span class="px-2">...</span>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">16</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="hidden fixed bg-white rounded-lg shadow-lg border py-2 z-50" style="min-width: 200px;">
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            Reassign Radiologist
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="edit" class="w-4 h-4"></i>
+            Override Status
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+            View Billing Details
+        </button>
+        <hr class="my-1">
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="flag" class="w-4 h-4"></i>
+            Flag for Compliance
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            View Audit Trail
+        </button>
+        <hr class="my-1">
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="archive" class="w-4 h-4"></i>
+            Archive Study
+        </button>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sample data
+        const studies = [
+            {
+                id: 1,
+                requestDate: 'Dec 20, 2024, 2:20 PM',
+                studyDate: 'Dec 20, 2024, 1:45 PM',
+                lastName: 'Brown',
+                firstName: 'Alice',
+                mrn: '654321',
+                accession: 'A-1002',
+                images: 560,
+                status: 'In Review',
+                priority: 'STAT',
+                study: 'CT Chest • Contrast Enhanced',
+                radiologist: 'Dr. Lisa Park, MD',
+                hospital: 'City Medical Center',
+                organization: 'NYC-001',
+                billing: 'Pending',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 2,
+                requestDate: 'Dec 19, 2024, 12:40 PM',
+                studyDate: 'Dec 19, 2024, 12:00 PM',
+                lastName: 'Kim',
+                firstName: 'Daniel',
+                mrn: '556677',
+                accession: 'A-1006',
+                images: 680,
+                status: 'In Review',
+                priority: 'STAT',
+                study: 'PET/CT Whole Body',
+                radiologist: 'Dr. Ethan Moore, MD',
+                hospital: 'Cancer Institute',
+                organization: 'NYC-002',
+                billing: 'Submitted',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 3,
+                requestDate: 'Dec 17, 2024, 3:15 AM',
+                studyDate: 'Dec 17, 2024, 2:55 AM',
+                lastName: 'Martinez',
+                firstName: 'Carlos',
+                mrn: '334455',
+                accession: 'A-1010',
+                images: 240,
+                status: 'Error',
+                priority: 'STAT',
+                study: 'CT Head • Trauma',
+                radiologist: 'Unassigned',
+                hospital: 'County Hospital',
+                organization: 'CHI-001',
+                billing: 'Failed',
+                compliance: 'Flagged',
+                tat: 'Overdue'
+            },
+            {
+                id: 4,
+                requestDate: 'Dec 20, 2024, 5:30 PM',
+                studyDate: 'Dec 20, 2024, 5:10 PM',
+                lastName: 'Nguyen',
+                firstName: 'Kevin',
+                mrn: '345678',
+                accession: 'A-1004',
+                images: 45,
+                status: 'Error',
+                priority: 'Standard',
+                study: 'Ultrasound Abdomen',
+                radiologist: 'Dr. Sarah Johnson',
+                hospital: 'County Hospital',
+                organization: 'CHI-001',
+                billing: 'Pending',
+                compliance: 'Under Review',
+                tat: 'At Risk'
+            },
+            {
+                id: 5,
+                requestDate: 'Dec 20, 2024, 9:30 AM',
+                studyDate: 'Dec 20, 2024, 8:50 AM',
+                lastName: 'Doe',
+                firstName: 'John',
+                mrn: '123456',
+                accession: 'A-1001',
+                images: 120,
+                status: 'Completed',
+                priority: 'Standard',
+                study: 'Chest X-Ray • PA & Lateral',
+                radiologist: 'Dr. Michael Chen, MD',
+                hospital: 'General Hospital',
+                organization: 'NYC-001',
+                billing: 'Paid',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 6,
+                requestDate: 'Dec 19, 2024, 10:15 AM',
+                studyDate: 'Dec 19, 2024, 9:55 AM',
+                lastName: 'Garcia',
+                firstName: 'Maria',
+                mrn: '112233',
+                accession: 'A-1005',
+                images: 220,
+                status: 'Completed',
+                priority: 'Standard',
+                study: 'Mammography • Screening Bilateral',
+                radiologist: 'Dr. Olivia Davis, MD',
+                hospital: "Women's Health Center",
+                organization: 'NYC-003',
+                billing: 'Submitted',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 7,
+                requestDate: 'Dec 18, 2024, 3:30 PM',
+                studyDate: 'Dec 18, 2024, 3:10 PM',
+                lastName: 'Lee',
+                firstName: 'Sophie',
+                mrn: '443322',
+                accession: 'A-1008',
+                images: 12,
+                status: 'Completed',
+                priority: 'Standard',
+                study: 'X-Ray Hand • 3 Views',
+                radiologist: 'Dr. Noah Turner, MD',
+                hospital: 'General Hospital',
+                organization: 'NYC-001',
+                billing: 'Paid',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 8,
+                requestDate: 'Dec 18, 2024, 2:25 PM',
+                studyDate: 'Dec 18, 2024, 1:50 PM',
+                lastName: 'Singh',
+                firstName: 'Aisha',
+                mrn: '998877',
+                accession: 'A-1007',
+                images: 350,
+                status: 'Completed',
+                priority: 'Standard',
+                study: 'CT Abdomen/Pelvis • Contrast',
+                radiologist: 'Dr. Mason Clark, MD',
+                hospital: 'City Medical Center',
+                organization: 'NYC-001',
+                billing: 'Paid',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 9,
+                requestDate: 'Dec 20, 2024, 11:30 AM',
+                studyDate: 'Dec 20, 2024, 11:00 AM',
+                lastName: 'Wilson',
+                firstName: 'Robert',
+                mrn: '776655',
+                accession: 'A-1009',
+                images: 180,
+                status: 'In Review',
+                priority: 'Urgent',
+                study: 'MRI Brain • With Contrast',
+                radiologist: 'Dr. Emma Rodriguez',
+                hospital: 'Neurology Center',
+                organization: 'BOS-001',
+                billing: 'Pending',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            },
+            {
+                id: 10,
+                requestDate: 'Dec 19, 2024, 4:45 PM',
+                studyDate: 'Dec 19, 2024, 4:15 PM',
+                lastName: 'Taylor',
+                firstName: 'Emily',
+                mrn: '889900',
+                accession: 'A-1011',
+                images: 90,
+                status: 'Pending',
+                priority: 'Routine',
+                study: 'CT Spine • Lumbar',
+                radiologist: 'Unassigned',
+                hospital: 'Orthopedic Institute',
+                organization: 'LA-001',
+                billing: 'Not Started',
+                compliance: 'Compliant',
+                tat: 'On Time'
+            }
+        ];
+
+        // Render table rows
+        function renderTableRows() {
+            const tbody = document.getElementById('studiesTableBody');
+            tbody.innerHTML = '';
+            
+            studies.forEach(study => {
+                const row = document.createElement('tr');
+                row.className = 'border-b table-row-hover';
+                row.innerHTML = `
+                    <td class="p-4">
+                        <input type="checkbox" class="study-checkbox rounded" data-id="${study.id}">
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-1">
+                            <button class="action-btn" title="View Study">
+                                <i data-lucide="eye" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <button class="action-btn" title="Study Information">
+                                <i data-lucide="info" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <button class="action-btn" title="Download">
+                                <i data-lucide="download" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                            <button class="action-btn more-actions" title="More Actions" data-id="${study.id}">
+                                <i data-lucide="more-vertical" class="w-4 h-4 text-gray-600"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="p-4 text-sm">${study.requestDate}</td>
+                    <td class="p-4 text-sm">${study.studyDate}</td>
+                    <td class="p-4 text-sm font-medium">${study.lastName}</td>
+                    <td class="p-4 text-sm">${study.firstName}</td>
+                    <td class="p-4 text-sm font-mono text-gray-600">${study.mrn}</td>
+                    <td class="p-4 text-sm font-mono text-gray-600">${study.accession}</td>
+                    <td class="p-4 text-sm text-center">${study.images}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            ${getStatusBadge(study.status)}
+                            ${getPriorityBadge(study.priority)}
+                        </div>
+                    </td>
+                    <td class="p-4 text-sm">${study.study}</td>
+                    <td class="p-4 text-sm">${study.radiologist}</td>
+                    <td class="p-4 text-sm">${study.hospital}</td>
+                    <td class="p-4 text-sm text-gray-600">${study.organization}</td>
+                    <td class="p-4">${getBillingBadge(study.billing)}</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            ${getComplianceBadge(study.compliance)}
+                            ${getTATBadge(study.tat)}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Re-initialize icons
+            lucide.createIcons();
+        }
+
+        // Badge generators
+        function getStatusBadge(status) {
+            const styles = {
+                'In Review': 'bg-blue-50 text-blue-600 border border-blue-200',
+                'Completed': 'bg-green-50 text-green-600 border border-green-200',
+                'Error': 'bg-red-50 text-red-600 border border-red-200',
+                'Pending': 'bg-yellow-50 text-yellow-600 border border-yellow-200'
+            };
+            return `<span class="stat-badge ${styles[status] || ''}">${status}</span>`;
+        }
+
+        function getPriorityBadge(priority) {
+            const styles = {
+                'STAT': 'bg-red-500 text-white',
+                'Urgent': 'bg-orange-500 text-white',
+                'Routine': 'bg-gray-400 text-white',
+                'Standard': 'bg-gray-300 text-gray-700'
+            };
+            return priority !== 'Standard' ? `<span class="stat-badge ${styles[priority] || ''}">${priority}</span>` : '';
+        }
+
+        function getBillingBadge(billing) {
+            const styles = {
+                'Paid': 'bg-green-50 text-green-600 border border-green-200',
+                'Submitted': 'bg-blue-50 text-blue-600 border border-blue-200',
+                'Pending': 'bg-yellow-50 text-yellow-600 border border-yellow-200',
+                'Failed': 'bg-red-50 text-red-600 border border-red-200',
+                'Not Started': 'bg-gray-50 text-gray-600 border border-gray-200'
+            };
+            return `<span class="stat-badge ${styles[billing] || ''}">${billing}</span>`;
+        }
+
+        function getComplianceBadge(compliance) {
+            const styles = {
+                'Compliant': 'bg-green-50 text-green-600 border border-green-200',
+                'Flagged': 'bg-red-50 text-red-600 border border-red-200',
+                'Under Review': 'bg-yellow-50 text-yellow-600 border border-yellow-200'
+            };
+            return `<span class="stat-badge ${styles[compliance] || ''}">${compliance}</span>`;
+        }
+
+        function getTATBadge(tat) {
+            const styles = {
+                'On Time': 'text-green-600',
+                'At Risk': 'text-yellow-600',
+                'Overdue': 'text-red-600'
+            };
+            const icons = {
+                'On Time': 'check-circle',
+                'At Risk': 'alert-circle',
+                'Overdue': 'x-circle'
+            };
+            return `<i data-lucide="${icons[tat]}" class="w-4 h-4 ${styles[tat]}"></i>`;
+        }
+
+        // Selection handling
+        let selectedStudies = new Set();
+        
+        document.getElementById('selectAll').addEventListener('change', function(e) {
+            const checkboxes = document.querySelectorAll('.study-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                if (e.target.checked) {
+                    selectedStudies.add(cb.dataset.id);
+                } else {
+                    selectedStudies.delete(cb.dataset.id);
+                }
+            });
+            updateBulkActions();
+        });
+
+        // Handle individual checkbox changes
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('study-checkbox')) {
+                if (e.target.checked) {
+                    selectedStudies.add(e.target.dataset.id);
+                } else {
+                    selectedStudies.delete(e.target.dataset.id);
+                }
+                updateBulkActions();
+            }
+        });
+
+        function updateBulkActions() {
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedStudies.size > 0) {
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = selectedStudies.size;
+            } else {
+                bulkActions.classList.add('hidden');
+            }
+        }
+
+        // Context menu
+        const contextMenu = document.getElementById('contextMenu');
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.more-actions')) {
+                e.preventDefault();
+                const rect = e.target.getBoundingClientRect();
+                contextMenu.style.left = rect.left + 'px';
+                contextMenu.style.top = (rect.bottom + 5) + 'px';
+                contextMenu.classList.remove('hidden');
+            } else {
+                contextMenu.classList.add('hidden');
+            }
+        });
+
+        // Initialize the table
+        renderTableRows();
+    </script>
+</body>
+</html>

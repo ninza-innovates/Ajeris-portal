@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Platform User Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .column-group { border-right: 2px solid #e5e7eb; }
+        .column-group:last-child { border-right: none; }
+        .sticky-header { position: sticky; top: 0; z-index: 40; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); }
+        .dropdown-menu { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .status-icon { display: inline-flex; align-items: center; justify-content: center; }
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; }
+        .table-container::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b sticky-header">
+        <div class="px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-semibold">Platform User Management</h1>
+                    <p class="text-sm text-gray-600 mt-1">Manage all users across the platform - Radiologists and Healthcare Staff</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="showExportModal()" class="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        Export Users
+                    </button>
+                    <button onclick="showAddUserModal()" class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        Add User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-5 gap-4 mb-6">
+            <div class="bg-white rounded-lg border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                    <span class="text-xs text-gray-500">All time</span>
+                </div>
+                <div class="text-2xl font-bold">247</div>
+                <div class="text-sm text-gray-600">Total Platform Users</div>
+                <div class="text-xs text-gray-500 mt-1">Across all organizations</div>
+            </div>
+            
+            <div class="bg-white rounded-lg border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="user-check" class="w-5 h-5 text-green-600"></i>
+                    <span class="text-xs text-green-600">+12 this week</span>
+                </div>
+                <div class="text-2xl font-bold">198</div>
+                <div class="text-sm text-gray-600">Currently Active</div>
+                <div class="text-xs text-gray-500 mt-1">Logged in last 30 days</div>
+            </div>
+            
+            <div class="bg-white rounded-lg border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="stethoscope" class="w-5 h-5 text-purple-600"></i>
+                    <span class="text-xs text-gray-500">82% verified</span>
+                </div>
+                <div class="text-2xl font-bold">156</div>
+                <div class="text-sm text-gray-600">Expert Radiologists</div>
+                <div class="text-xs text-gray-500 mt-1">Licensed professionals</div>
+            </div>
+            
+            <div class="bg-white rounded-lg border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="building" class="w-5 h-5 text-blue-600"></i>
+                    <span class="text-xs text-gray-500">15 orgs</span>
+                </div>
+                <div class="text-2xl font-bold">91</div>
+                <div class="text-sm text-gray-600">Healthcare Staff</div>
+                <div class="text-xs text-gray-500 mt-1">Facility users</div>
+            </div>
+            
+            <div class="bg-white rounded-lg border p-6 hover:shadow-md transition-shadow">
+                <div class="flex items-center justify-between mb-2">
+                    <i data-lucide="alert-circle" class="w-5 h-5 text-orange-600"></i>
+                    <span class="text-xs text-orange-600">Action needed</span>
+                </div>
+                <div class="text-2xl font-bold">23</div>
+                <div class="text-sm text-gray-600">Pending Verification</div>
+                <div class="text-xs text-gray-500 mt-1">Awaiting email/ID verify</div>
+            </div>
+        </div>
+
+        <!-- Advanced Filters -->
+        <div class="bg-white rounded-lg border p-4 mb-6">
+            <div class="space-y-4">
+                <!-- Search Bar -->
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 relative">
+                        <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder='Search users... Try: "email:*@hospital.com" or "2fa:disabled"' 
+                               class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-blue-600 hover:text-blue-700">
+                            Advanced
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Row -->
+                <div class="flex items-center gap-3 flex-wrap">
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>All Types</option>
+                        <option>Expert (Radiologist)</option>
+                        <option>Healthcare (Staff)</option>
+                    </select>
+                    
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>All Organizations</option>
+                        <option>City Medical Center</option>
+                        <option>County Hospital</option>
+                        <option>Rural Clinic</option>
+                    </select>
+                    
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>All Statuses</option>
+                        <option>Active</option>
+                        <option>Suspended</option>
+                        <option>Locked</option>
+                        <option>Inactive</option>
+                    </select>
+                    
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>Email Verification</option>
+                        <option>Verified</option>
+                        <option>Unverified</option>
+                    </select>
+                    
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>2FA Status</option>
+                        <option>Enabled</option>
+                        <option>Disabled</option>
+                    </select>
+                    
+                    <select class="px-3 py-2 border rounded-lg text-sm">
+                        <option>License Status</option>
+                        <option>Active</option>
+                        <option>Expiring Soon</option>
+                        <option>Expired</option>
+                    </select>
+                    
+                    <button class="flex items-center gap-2 px-3 py-2 border rounded-lg text-sm hover:bg-gray-50">
+                        <i data-lucide="filter" class="w-4 h-4"></i>
+                        More Filters
+                    </button>
+                    
+                    <button class="px-3 py-2 text-sm text-blue-600 hover:text-blue-700">
+                        Clear All
+                    </button>
+                </div>
+
+                <!-- Active Filters -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-sm text-gray-500">Active filters:</span>
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
+                        Type: Expert
+                        <button class="hover:text-blue-900"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </span>
+                    <span class="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded text-sm">
+                        2FA: Disabled
+                        <button class="hover:text-blue-900"><i data-lucide="x" class="w-3 h-3"></i></button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Bar -->
+        <div id="bulkActions" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 hidden">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-sm font-medium text-blue-900">
+                        <span id="selectedCount">0</span> users selected
+                    </span>
+                    <button class="text-sm text-blue-600 hover:text-blue-700">Select all 247</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Send Verification Email
+                    </button>
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Enable 2FA
+                    </button>
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Reset Password
+                    </button>
+                    <button class="px-3 py-1.5 bg-white border rounded text-sm hover:bg-gray-50">
+                        Export Selected
+                    </button>
+                    <div class="border-l mx-2 h-6"></div>
+                    <button class="px-3 py-1.5 bg-orange-600 text-white rounded text-sm hover:bg-orange-700">
+                        Suspend
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg border overflow-hidden">
+            <div class="table-container overflow-x-auto">
+                <table class="w-full" style="min-width: 1800px;">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="p-3 text-left sticky left-0 bg-gray-50 z-10">
+                                <input type="checkbox" id="selectAll" class="rounded">
+                            </th>
+                            
+                            <!-- Identity Group -->
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Name</th>
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Email</th>
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Type</th>
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Organization</th>
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Role</th>
+                            
+                            <!-- Access & Security Group -->
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Status</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Email</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">2FA</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Logins</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase column-group">Failed</th>
+                            
+                            <!-- Compliance Group -->
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">License</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Contract</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase column-group">Training</th>
+                            
+                            <!-- Activity Group -->
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase">Created</th>
+                            <th class="p-3 text-left text-xs font-medium text-gray-700 uppercase column-group">Last Active</th>
+                            
+                            <!-- Admin -->
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Notes</th>
+                            <th class="p-3 text-center text-xs font-medium text-gray-700 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="border-t px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-600">
+                        Showing 1 to 10 of 247 users
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50" disabled>
+                            Previous
+                        </button>
+                        <button class="px-3 py-1 bg-blue-600 text-white rounded">1</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">3</button>
+                        <span class="px-2">...</span>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">25</button>
+                        <button class="px-3 py-1 border rounded hover:bg-gray-50">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Actions Dropdown -->
+    <div id="userActionsMenu" class="hidden fixed bg-white rounded-lg shadow-lg border py-2 z-50" style="min-width: 220px;">
+        <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">View</div>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="user" class="w-4 h-4"></i>
+            View Full Profile
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            View Activity Log
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4"></i>
+            View Login History
+        </button>
+        
+        <hr class="my-2">
+        <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Security</div>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="key" class="w-4 h-4"></i>
+            Reset Password
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            Toggle 2FA
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="unlock" class="w-4 h-4"></i>
+            Unlock Account
+        </button>
+        
+        <hr class="my-2">
+        <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Admin</div>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            Login as User
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="building" class="w-4 h-4"></i>
+            Change Organization
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center gap-2">
+            <i data-lucide="message-square" class="w-4 h-4"></i>
+            Add Admin Note
+        </button>
+        
+        <hr class="my-2">
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2">
+            <i data-lucide="ban" class="w-4 h-4"></i>
+            Suspend User
+        </button>
+        <button class="w-full px-4 py-2 text-left text-sm hover:bg-red-50 text-red-600 flex items-center gap-2">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+            Delete User
+        </button>
+    </div>
+
+    <!-- User Detail Modal -->
+    <div id="userDetailModal" class="hidden fixed inset-0 z-50">
+        <div class="modal-backdrop fixed inset-0" onclick="closeUserDetailModal()"></div>
+        <div class="fixed inset-0 flex items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+                    <h2 class="text-xl font-semibold">User Details</h2>
+                    <button onclick="closeUserDetailModal()" class="p-2 hover:bg-gray-100 rounded">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                
+                <div class="p-6">
+                    <!-- User detail content will be inserted here -->
+                    <div class="grid grid-cols-3 gap-6">
+                        <div class="col-span-2 space-y-6">
+                            <!-- Basic Information -->
+                            <div>
+                                <h3 class="text-lg font-medium mb-4">Basic Information</h3>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Full Name</span>
+                                        <span class="text-sm font-medium">Dr. Sarah Johnson</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Email</span>
+                                        <span class="text-sm font-medium">sarah.johnson@cityhospital.com</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Phone</span>
+                                        <span class="text-sm font-medium">+1 (555) 123-4567</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">User Type</span>
+                                        <span class="text-sm font-medium">Expert (Radiologist)</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Professional Information -->
+                            <div>
+                                <h3 class="text-lg font-medium mb-4">Professional Information</h3>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">NPI Number</span>
+                                        <span class="text-sm font-medium">1234567890</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Medical License</span>
+                                        <span class="text-sm font-medium">NY-12345</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">License Expiry</span>
+                                        <span class="text-sm font-medium">Dec 31, 2025</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Specialties</span>
+                                        <span class="text-sm font-medium">Neuroradiology, MRI</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Information -->
+                            <div>
+                                <h3 class="text-lg font-medium mb-4">Security & Access</h3>
+                                <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Email Verified</span>
+                                        <span class="text-sm font-medium text-green-600">✓ Verified</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-sm text-gray-600">Two-Factor Authentication</span>
+                                        <span class="text-sm font-medium text-green-600">🔐 Enabled</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Last Password Change</span>
+                                        <span class="text-sm font-medium">45 days ago</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-sm text-gray-600">Failed Login Attempts</span>
+                                        <span class="text-sm font-medium">0 (last 30 days)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-6">
+                            <!-- Quick Stats -->
+                            <div>
+                                <h3 class="text-lg font-medium mb-4">Activity Summary</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-blue-50 rounded-lg p-4">
+                                        <div class="text-2xl font-bold text-blue-700">342</div>
+                                        <div class="text-sm text-blue-600">Total Logins</div>
+                                    </div>
+                                    <div class="bg-green-50 rounded-lg p-4">
+                                        <div class="text-2xl font-bold text-green-700">1,247</div>
+                                        <div class="text-sm text-green-600">Studies Reviewed</div>
+                                    </div>
+                                    <div class="bg-purple-50 rounded-lg p-4">
+                                        <div class="text-2xl font-bold text-purple-700">18 min</div>
+                                        <div class="text-sm text-purple-600">Avg Response Time</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Admin Notes -->
+                            <div>
+                                <h3 class="text-lg font-medium mb-4">Admin Notes</h3>
+                                <div class="bg-yellow-50 rounded-lg p-4">
+                                    <div class="text-sm text-yellow-800">
+                                        <p class="mb-2">• License expires in 60 days - reminder sent</p>
+                                        <p>• VIP user - prioritize support requests</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sample user data with all required fields
+        const users = [
+            {
+                id: 1,
+                name: 'Dr. Sarah Johnson',
+                email: 'sarah.johnson@cityhospital.com',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'City Hospital',
+                role: 'RAD',
+                status: 'Active',
+                emailVerified: true,
+                twoFactorEnabled: true,
+                loginCount: 342,
+                failedAttempts: 0,
+                licenseStatus: 'Active',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2024-01-15',
+                lastActive: '2024-01-20 14:30',
+                hasNotes: true,
+                accountLocked: false,
+                createdBy: 'Admin User',
+                studiesReviewed: 1247
+            },
+            {
+                id: 2,
+                name: 'Dr. Michael Chen',
+                email: 'michael.chen@ruralclinic.com',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'Rural Clinic',
+                role: 'RAD',
+                status: 'Active',
+                emailVerified: true,
+                twoFactorEnabled: false,
+                loginCount: 89,
+                failedAttempts: 2,
+                licenseStatus: 'Expiring',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2024-01-10',
+                lastActive: '2024-01-20 12:15',
+                hasNotes: false,
+                accountLocked: false,
+                createdBy: 'System Import',
+                studiesReviewed: 456
+            },
+            {
+                id: 3,
+                name: 'Emily Rodriguez',
+                email: 'emily.r@cityhospital.com',
+                type: 'Healthcare',
+                typeLabel: 'Healthcare (Staff)',
+                organization: 'City Hospital',
+                role: 'ADMIN',
+                status: 'Active',
+                emailVerified: true,
+                twoFactorEnabled: true,
+                loginCount: 156,
+                failedAttempts: 0,
+                licenseStatus: 'N/A',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2023-11-20',
+                lastActive: '2024-01-20 16:45',
+                hasNotes: false,
+                accountLocked: false,
+                createdBy: 'Dr. Smith',
+                studiesSubmitted: 823
+            },
+            {
+                id: 4,
+                name: 'Dr. James Wilson',
+                email: 'jwilson@metrohealth.org',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'Metro Health',
+                role: 'RAD',
+                status: 'Suspended',
+                emailVerified: true,
+                twoFactorEnabled: false,
+                loginCount: 12,
+                failedAttempts: 5,
+                licenseStatus: 'Expired',
+                contractStatus: 'Expired',
+                trainingCompleted: false,
+                created: '2023-08-15',
+                lastActive: '2023-12-01 09:30',
+                hasNotes: true,
+                accountLocked: true,
+                createdBy: 'Admin User',
+                studiesReviewed: 67
+            },
+            {
+                id: 5,
+                name: 'Maria Garcia',
+                email: 'mgarcia@womenshealth.com',
+                type: 'Healthcare',
+                typeLabel: 'Healthcare (Staff)',
+                organization: "Women's Health Center",
+                role: 'BILLING',
+                status: 'Active',
+                emailVerified: false,
+                twoFactorEnabled: false,
+                loginCount: 45,
+                failedAttempts: 1,
+                licenseStatus: 'N/A',
+                contractStatus: 'Signed',
+                trainingCompleted: false,
+                created: '2024-01-05',
+                lastActive: '2024-01-19 11:20',
+                hasNotes: true,
+                accountLocked: false,
+                createdBy: 'Emily Rodriguez',
+                studiesSubmitted: 234
+            },
+            {
+                id: 6,
+                name: 'Dr. Robert Kim',
+                email: 'rkim@neuroimaging.net',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'Neuro Imaging Center',
+                role: 'RAD',
+                status: 'Inactive',
+                emailVerified: true,
+                twoFactorEnabled: true,
+                loginCount: 523,
+                failedAttempts: 0,
+                licenseStatus: 'Active',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2023-03-10',
+                lastActive: '2023-11-15 14:00',
+                hasNotes: false,
+                accountLocked: false,
+                createdBy: 'System Import',
+                studiesReviewed: 2341
+            },
+            {
+                id: 7,
+                name: 'Lisa Thompson',
+                email: 'lthompson@countyhospital.gov',
+                type: 'Healthcare',
+                typeLabel: 'Healthcare (Staff)',
+                organization: 'County Hospital',
+                role: 'CLINIC',
+                status: 'Active',
+                emailVerified: true,
+                twoFactorEnabled: false,
+                loginCount: 234,
+                failedAttempts: 0,
+                licenseStatus: 'N/A',
+                contractStatus: 'Pending',
+                trainingCompleted: true,
+                created: '2023-09-22',
+                lastActive: '2024-01-20 15:55',
+                hasNotes: false,
+                accountLocked: false,
+                createdBy: 'Admin User',
+                studiesSubmitted: 567
+            },
+            {
+                id: 8,
+                name: 'Dr. Ahmed Patel',
+                email: 'apatel@radiologyexperts.com',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'Radiology Experts LLC',
+                role: 'RAD',
+                status: 'Active',
+                emailVerified: false,
+                twoFactorEnabled: false,
+                loginCount: 0,
+                failedAttempts: 0,
+                licenseStatus: 'Active',
+                contractStatus: 'Pending',
+                trainingCompleted: false,
+                created: '2024-01-18',
+                lastActive: 'Never',
+                hasNotes: true,
+                accountLocked: false,
+                createdBy: 'Self-registered',
+                studiesReviewed: 0
+            },
+            {
+                id: 9,
+                name: 'Jennifer Brown',
+                email: 'jbrown@cityhospital.com',
+                type: 'Healthcare',
+                typeLabel: 'Healthcare (Staff)',
+                organization: 'City Hospital',
+                role: 'CLINIC',
+                status: 'Locked',
+                emailVerified: true,
+                twoFactorEnabled: true,
+                loginCount: 78,
+                failedAttempts: 10,
+                licenseStatus: 'N/A',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2023-06-10',
+                lastActive: '2024-01-15 08:30',
+                hasNotes: true,
+                accountLocked: true,
+                createdBy: 'Emily Rodriguez',
+                studiesSubmitted: 123
+            },
+            {
+                id: 10,
+                name: 'Dr. Susan Lee',
+                email: 'slee@pediatricimaging.org',
+                type: 'Expert',
+                typeLabel: 'Expert (Radiologist)',
+                organization: 'Pediatric Imaging',
+                role: 'RAD',
+                status: 'Active',
+                emailVerified: true,
+                twoFactorEnabled: true,
+                loginCount: 876,
+                failedAttempts: 0,
+                licenseStatus: 'Active',
+                contractStatus: 'Signed',
+                trainingCompleted: true,
+                created: '2023-02-01',
+                lastActive: '2024-01-20 17:15',
+                hasNotes: false,
+                accountLocked: false,
+                createdBy: 'System Import',
+                studiesReviewed: 3456
+            }
+        ];
+
+        // Render table rows
+        function renderTableRows() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+            
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'border-b hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="p-3 sticky left-0 bg-white">
+                        <input type="checkbox" class="user-checkbox rounded" data-id="${user.id}">
+                    </td>
+                    
+                    <!-- Identity -->
+                    <td class="p-3 font-medium column-group">${user.name}</td>
+                    <td class="p-3 text-sm column-group">${user.email}</td>
+                    <td class="p-3 text-sm column-group">
+                        <span class="text-xs px-2 py-1 rounded-full ${user.type === 'Expert' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
+                            ${user.typeLabel}
+                        </span>
+                    </td>
+                    <td class="p-3 text-sm column-group">${user.organization}</td>
+                    <td class="p-3 text-sm font-mono column-group">${user.role}</td>
+                    
+                    <!-- Security -->
+                    <td class="p-3 text-center">${getStatusBadge(user.status)}</td>
+                    <td class="p-3 text-center">${getEmailVerifiedIcon(user.emailVerified)}</td>
+                    <td class="p-3 text-center">${get2FAIcon(user.twoFactorEnabled)}</td>
+                    <td class="p-3 text-center text-sm">${user.loginCount}</td>
+                    <td class="p-3 text-center column-group">
+                        <span class="${user.failedAttempts > 5 ? 'text-red-600 font-medium' : 'text-gray-600'}">${user.failedAttempts}</span>
+                    </td>
+                    
+                    <!-- Compliance -->
+                    <td class="p-3 text-center">${getLicenseBadge(user.licenseStatus)}</td>
+                    <td class="p-3 text-center">${getContractBadge(user.contractStatus)}</td>
+                    <td class="p-3 text-center column-group">${getTrainingIcon(user.trainingCompleted)}</td>
+                    
+                    <!-- Activity -->
+                    <td class="p-3 text-sm text-gray-600">${user.created}</td>
+                    <td class="p-3 text-sm text-gray-600 column-group">${user.lastActive}</td>
+                    
+                    <!-- Admin -->
+                    <td class="p-3 text-center">
+                        ${user.hasNotes ? '<i data-lucide="message-square" class="w-4 h-4 text-yellow-600 mx-auto"></i>' : '-'}
+                    </td>
+                    <td class="p-3 text-center">
+                        <button class="user-actions p-1.5 hover:bg-gray-100 rounded" data-id="${user.id}">
+                            <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Re-initialize icons
+            lucide.createIcons();
+        }
+
+        // Badge and icon generators
+        function getStatusBadge(status) {
+            const styles = {
+                'Active': 'bg-green-100 text-green-700',
+                'Suspended': 'bg-orange-100 text-orange-700',
+                'Locked': 'bg-red-100 text-red-700',
+                'Inactive': 'bg-gray-100 text-gray-700'
+            };
+            return `<span class="text-xs px-2 py-1 rounded-full ${styles[status]}">${status}</span>`;
+        }
+
+        function getEmailVerifiedIcon(verified) {
+            return verified 
+                ? '<span class="text-green-600">✓</span>' 
+                : '<span class="text-red-600">✗</span>';
+        }
+
+        function get2FAIcon(enabled) {
+            return enabled 
+                ? '<span class="text-green-600">🔐</span>' 
+                : '<span class="text-yellow-600">⚠️</span>';
+        }
+
+        function getLicenseBadge(status) {
+            const styles = {
+                'Active': 'text-green-600',
+                'Expiring': 'text-yellow-600',
+                'Expired': 'text-red-600',
+                'N/A': 'text-gray-400'
+            };
+            return `<span class="${styles[status]} text-sm font-medium">${status}</span>`;
+        }
+
+        function getContractBadge(status) {
+            const styles = {
+                'Signed': 'text-green-600',
+                'Pending': 'text-yellow-600',
+                'Expired': 'text-red-600',
+                'N/A': 'text-gray-400'
+            };
+            return `<span class="${styles[status]} text-sm font-medium">${status}</span>`;
+        }
+
+        function getTrainingIcon(completed) {
+            return completed 
+                ? '<span class="text-green-600">✓</span>' 
+                : '<span class="text-yellow-600">○</span>';
+        }
+
+        // Selection handling
+        let selectedUsers = new Set();
+        
+        document.getElementById('selectAll').addEventListener('change', function(e) {
+            const checkboxes = document.querySelectorAll('.user-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = e.target.checked;
+                if (e.target.checked) {
+                    selectedUsers.add(cb.dataset.id);
+                } else {
+                    selectedUsers.delete(cb.dataset.id);
+                }
+            });
+            updateBulkActions();
+        });
+
+        // Handle individual checkbox changes
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('user-checkbox')) {
+                if (e.target.checked) {
+                    selectedUsers.add(e.target.dataset.id);
+                } else {
+                    selectedUsers.delete(e.target.dataset.id);
+                }
+                updateBulkActions();
+            }
+        });
+
+        function updateBulkActions() {
+            const bulkActions = document.getElementById('bulkActions');
+            const selectedCount = document.getElementById('selectedCount');
+            
+            if (selectedUsers.size > 0) {
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = selectedUsers.size;
+            } else {
+                bulkActions.classList.add('hidden');
+            }
+        }
+
+        // User actions menu
+        const userActionsMenu = document.getElementById('userActionsMenu');
+        
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.user-actions')) {
+                e.preventDefault();
+                const rect = e.target.getBoundingClientRect();
+                userActionsMenu.style.left = (rect.left - 200) + 'px';
+                userActionsMenu.style.top = (rect.bottom + 5) + 'px';
+                userActionsMenu.classList.remove('hidden');
+            } else if (!e.target.closest('#userActionsMenu')) {
+                userActionsMenu.classList.add('hidden');
+            }
+        });
+
+        // User detail modal
+        function showUserDetail(userId) {
+            document.getElementById('userDetailModal').classList.remove('hidden');
+        }
+
+        function closeUserDetailModal() {
+            document.getElementById('userDetailModal').classList.add('hidden');
+        }
+
+        // Export modal
+        function showExportModal() {
+            alert('Export functionality - would show export options modal');
+        }
+
+        // Add user modal
+        function showAddUserModal() {
+            alert('Add user functionality - would show add user form modal');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            // Implement search logic here
+            console.log('Searching for:', searchTerm);
+        });
+
+        // Double click to view details
+        document.addEventListener('dblclick', function(e) {
+            const row = e.target.closest('tr');
+            if (row && row.querySelector('.user-checkbox')) {
+                const userId = row.querySelector('.user-checkbox').dataset.id;
+                showUserDetail(userId);
+            }
+        });
+
+        // Initialize the table
+        renderTableRows();
+    </script>
+</body>
+</html>
