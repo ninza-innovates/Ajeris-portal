@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Auth</title>
+</head>
+<body>
+    <h1>Clear Authentication</h1>
+    <p>Open this file in your browser to clear the authentication token.</p>
+    <button onclick="clearAuth()">Clear Authentication</button>
+    <p id="status"></p>
+    
+    <script>
+        function clearAuth() {
+            localStorage.removeItem('ajeris-admin-auth');
+            document.getElementById('status').textContent = 'Authentication cleared! You can now go to http://localhost:3000/login';
+        }
+    </script>
+</body>
+</html>
