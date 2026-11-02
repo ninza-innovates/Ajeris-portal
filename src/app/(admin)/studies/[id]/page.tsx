@@ -193,7 +193,7 @@ export default function StudyDetailPage() {
       <div className="flex flex-col items-center justify-center py-12">
         <FileText className="h-12 w-12 text-muted-foreground mb-4" />
         <h3 className="text-lg font-semibold mb-2">Study not found</h3>
-        <p className="text-muted-foreground mb-6">The requested study could not be found or you don't have permission to view it.</p>
+        <p className="text-muted-foreground mb-6">The requested study could not be found or you don&apos;t have permission to view it.</p>
         <Button
           variant="outline"
           onClick={() => router.push('/studies')}

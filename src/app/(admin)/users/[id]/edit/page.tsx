@@ -173,7 +173,7 @@ export default function EditUserPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      User's access level within the system
+                      User&apos;s access level within the system
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -228,7 +228,7 @@ export default function EditUserPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Control user's access to the system
+                      Control user&apos;s access to the system
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

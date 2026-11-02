@@ -654,7 +654,7 @@ export default function UsersPage() {
           <DialogHeader>
             <DialogTitle>Unlock Account</DialogTitle>
             <DialogDescription>
-              Unlock {selectedUser?.name}'s account? This will reset failed login attempts.
+              Unlock {selectedUser?.name}&apos;s account? This will reset failed login attempts.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

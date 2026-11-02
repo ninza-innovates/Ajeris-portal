@@ -56,7 +56,7 @@ export function EditOrganizationDialog({ organization, open, onOpenChange }: Edi
         <DialogHeader>
           <DialogTitle>Edit Organization</DialogTitle>
           <DialogDescription>
-            Update the organization's information
+            Update the organization&apos;s information
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">

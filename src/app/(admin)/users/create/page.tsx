@@ -240,7 +240,7 @@ export default function CreateUserPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      User's access level within the system
+                      User&apos;s access level within the system
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

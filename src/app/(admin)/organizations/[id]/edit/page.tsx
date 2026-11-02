@@ -177,7 +177,7 @@ export default function EditOrganizationPage() {
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
               <CardDescription>
-                Update the organization's basic details and contact information
+                Update the organization&apos;s basic details and contact information
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

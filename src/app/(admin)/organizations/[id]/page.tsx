@@ -182,7 +182,7 @@ export default function OrganizationDetailPage() {
       <div className="flex flex-col items-center justify-center py-12">
         <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-lg font-medium mb-2">Organization not found</p>
-        <p className="text-muted-foreground mb-4">The organization you're looking for doesn't exist or has been removed.</p>
+        <p className="text-muted-foreground mb-4">The organization you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         <Button
           variant="outline"
           onClick={() => router.push('/organizations')}

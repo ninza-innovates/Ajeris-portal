@@ -28,7 +28,8 @@ import { Calendar } from '@/components/ui/calendar'
 import { Radiologist } from '@/types/radiologist'
 import { Calendar as CalendarIcon, Clock, User, Mail, Phone, Award } from 'lucide-react'
 import { useUpdateRadiologist } from '@/lib/api/hooks/use-radiologists'
-import { useStudies, useReassignStudy } from '@/lib/api/hooks/use-studies'
+import { useStudies } from '@/lib/api/hooks/use-studies'
+import { StudiesService } from '@/lib/api/services'
 import { Skeleton } from '@/components/ui/skeleton'
 import { toast } from '@/components/ui/use-toast'
 
@@ -77,7 +78,7 @@ export function EditRadiologistDialog({ radiologist, open, onOpenChange }: EditR
         <DialogHeader>
           <DialogTitle>Edit Radiologist Information</DialogTitle>
           <DialogDescription>
-            Update the radiologist's basic information
+            Update the radiologist&apos;s basic information
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -142,7 +143,7 @@ export function ScheduleDialog({ radiologist, open, onOpenChange }: ScheduleDial
         <DialogHeader>
           <DialogTitle>Manage Schedule - {radiologist.name}</DialogTitle>
           <DialogDescription>
-            View and manage the radiologist's schedule
+            View and manage the radiologist&apos;s schedule
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">
@@ -207,10 +208,10 @@ export function AssignStudiesDialog({ radiologist, open, onOpenChange }: AssignS
     try {
       // Assign each selected study to the radiologist
       await Promise.all(
-        selectedStudies.map(studyId => 
-          useReassignStudy(studyId).mutateAsync({
-            assignedTo: radiologist.id,
-            priority: 'Normal'
+        selectedStudies.map((studyId) =>
+          StudiesService.reassignStudy(studyId, {
+            radiologistId: radiologist.id,
+            reason: 'Assigned from admin portal',
           })
         )
       )
