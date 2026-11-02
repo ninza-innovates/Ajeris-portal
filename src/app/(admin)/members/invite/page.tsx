@@ -198,7 +198,7 @@ export default function InviteMemberPage() {
           <ul className="mt-2 space-y-1 text-sm">
             <li>• The invited member will receive an email with a secure link to set up their account</li>
             <li>• They must accept the invitation within 7 days before it expires</li>
-            <li>• Upon acceptance, they'll be prompted to create a password and enable two-factor authentication</li>
+            <li>• Upon acceptance, they&apos;ll be prompted to create a password and enable two-factor authentication</li>
             <li>• You can track the invitation status from the members list</li>
           </ul>
         </AlertDescription>
@@ -225,7 +225,7 @@ export default function InviteMemberPage() {
                       <Input placeholder="John Doe" {...field} />
                     </FormControl>
                     <FormDescription>
-                      The member's full name as it will appear in the system
+                      The member&apos;s full name as it will appear in the system
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -311,7 +311,7 @@ export default function InviteMemberPage() {
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Determines the member's base access level
+                      Determines the member&apos;s base access level
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

@@ -23,7 +23,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back! Here's an overview of your platform.
+            Welcome back! Here&apos;s an overview of your platform.
           </p>
         </div>
         
@@ -89,7 +89,7 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back! Here's an overview of your platform.
+            Welcome back! Here&apos;s an overview of your platform.
           </p>
         </div>
         <Button 

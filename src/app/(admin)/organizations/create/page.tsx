@@ -220,7 +220,7 @@ export default function CreateOrganizationPage() {
             <CardHeader>
               <CardTitle>Basic Information</CardTitle>
               <CardDescription>
-                Enter the organization's basic details and contact information
+                Enter the organization&apos;s basic details and contact information
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

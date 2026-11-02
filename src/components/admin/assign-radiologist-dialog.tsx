@@ -228,6 +228,7 @@ export function AssignRadiologistDialog({
               </div>
             ))
           )}
+          </div>
 
           {selectedRadiologists.size > 0 && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
