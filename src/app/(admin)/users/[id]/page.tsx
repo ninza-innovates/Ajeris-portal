@@ -27,6 +27,10 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
+function statusIs(status: string, expected: 'active' | 'suspended' | 'locked') {
+  return status.toLowerCase() === expected;
+}
+
 export default function UserDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -154,11 +158,11 @@ export default function UserDetailsPage() {
                       <div className="mt-1">
                         <span
                           className={classNames(
-                            user.status === 'active' || user.status === 'Active'
+                            statusIs(user.status, 'active')
                               ? 'bg-green-100 text-green-800'
-                              : user.status === 'suspended' || user.status === 'Suspended'
+                              : statusIs(user.status, 'suspended')
                               ? 'bg-red-100 text-red-800'
-                              : user.status === 'locked' || user.status === 'Locked'
+                              : statusIs(user.status, 'locked')
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-gray-800',
                             'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium'
@@ -197,13 +201,13 @@ export default function UserDetailsPage() {
                   <button
                     onClick={handleToggleStatus}
                     className={classNames(
-                      user.status === 'active' || user.status === 'Active'
+                      statusIs(user.status, 'active')
                         ? 'text-red-700 hover:bg-red-50'
                         : 'text-green-700 hover:bg-green-50',
                       'inline-flex items-center justify-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
                     )}
                   >
-                    {user.status === 'active' || user.status === 'Active' ? (
+                    {statusIs(user.status, 'active') ? (
                       <>
                         <PauseCircleIcon className="h-4 w-4 mr-2" />
                         Suspend
