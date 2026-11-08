@@ -36,8 +36,8 @@ A modern, production-ready admin portal for the Ajeris Medical Platform built wi
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Ajeris-AI/ajeris-prototypes.git
-cd ajeris-admin-portal
+git clone https://github.com/ninza-innovates/Ajeris-portal.git
+cd Ajeris-portal
 ```
 
 2. Install dependencies:
@@ -45,12 +45,17 @@ cd ajeris-admin-portal
 npm install
 ```
 
-3. Run the development server:
+3. Copy the environment file:
+```bash
+cp .env.local.example .env.local
+```
+
+4. Run the development server:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Default Credentials
 
