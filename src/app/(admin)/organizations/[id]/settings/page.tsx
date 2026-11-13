@@ -51,10 +51,15 @@ export default function OrganizationSettingsPage() {
   const updateOrganization = useUpdateOrganization()
   const testHL7 = useTestHL7()
 
-  // Initialize form data when organization loads
+  // Seed the form once, when the organization first loads. Later query
+  // updates must not overwrite fields the user has already edited.
   useEffect(() => {
-    if (organization && !formData) {
-      setFormData({
+    if (!organization) return
+
+    setFormData((current: typeof formData) => {
+      if (current) return current
+
+      return {
         name: organization.name,
         type: organization.type,
         status: organization.status || 'active',
@@ -73,8 +78,8 @@ export default function OrganizationSettingsPage() {
         hl7Version: organization.hl7Settings?.version || '2.5',
         pacsSystem: organization.pacsSystem || '',
         pacsAETitle: organization.pacsAETitle || '',
-      })
-    }
+      }
+    })
   }, [organization])
 
   if (isLoading) {
