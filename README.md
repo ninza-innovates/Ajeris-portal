@@ -113,7 +113,7 @@ The `public/` directory contains HTML prototypes:
 
 ## License
 
-This project is proprietary software owned by Ajeris Medical Platform.
+This project is licensed under the [MIT License](LICENSE). Copyright (c) 2026 Carl Layton.
 
 ## Support
 
