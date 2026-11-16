@@ -1,0 +1,79 @@
+name: Bug report
+description: Something in the admin portal is broken or behaves unexpectedly.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe one problem. Include the portal area, the role you were signed in as, and the steps that reproduce it.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of the portal is affected?
+      options:
+        - Login
+        - Dashboard
+        - Users
+        - Studies
+        - Organizations
+        - Radiologists
+        - Reports
+        - Billing
+        - Settings
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Signed-in role
+      description: The role on the account that hit the problem. The local demo account in the README is SUPER_ADMIN.
+      options:
+        - SUPER_ADMIN
+        - ADMIN
+        - RAD
+        - CLINIC
+        - BILLING
+        - Not signed in
+        - Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you saw, including any error text from the page or the browser console.
+      placeholder: Saving organization settings clears the fields I already edited.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Start from a fresh sign-in when you can.
+      placeholder: |
+        1. Sign in as SUPER_ADMIN.
+        2. Open Organizations and pick an organization.
+        3. Open Settings and change the name.
+        4. Wait for the page to refresh.
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      description: Browser name and version, if the problem is in the UI.
+      placeholder: Chrome 131
+  - type: textarea
+    id: context
+    attributes:
+      label: Extra context
+      description: Screenshots, whether this is the local demo (`admin@ajeris.com`) or another environment, and anything else that helps.

@@ -25,6 +25,10 @@ Open [http://localhost:3000](http://localhost:3000).
 
 There is no test script. Lint is the check CI runs on every push and pull request.
 
+## Issues
+
+Report a bug or request a feature with the templates in `.github/ISSUE_TEMPLATE`. Name the portal area (login, dashboard, users, studies, organizations, radiologists, reports, billing, or settings). For a bug, include the signed-in role (`SUPER_ADMIN`, `ADMIN`, `RAD`, `CLINIC`, or `BILLING`) and the steps that reproduce it. The local demo account in the README is `SUPER_ADMIN`.
+
 ## Branches and pull requests
 
 Branch from `main` with a short name that says what the change does, such as `fix/login-redirect` or `feature/study-filters`.
