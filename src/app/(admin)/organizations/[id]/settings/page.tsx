@@ -1,7 +1,8 @@
 'use client'
 
 import { useParams, useRouter } from 'next/navigation'
-import { useOrganization, useUpdateOrganization, useTestHL7 } from '@/lib/api/hooks/use-organizations'
+import { useOrganization, useUpdateOrganization, useTestHL7Connection } from '@/lib/api/hooks/use-organizations'
+import type { Organization } from '@/lib/api/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -38,6 +39,35 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog'
 
+// The organization mapper returns contact, HL7, and PACS fields that the
+// Organization interface does not declare. This is the shape the form reads.
+type LoadedOrganization = {
+  id: string
+  name: string
+  type?: string
+  status?: string
+  email?: string
+  phone?: string
+  contact?: { name?: string; email?: string; phone?: string }
+  address?: { street?: string; city?: string; state?: string; zip?: string } | string
+  aeTitle?: string
+  datastoreId?: string
+  hl7InterfaceEnabled?: boolean
+  hl7Settings?: { endpoint?: string; port?: string | number; version?: string }
+  hl7Endpoint?: string
+  hl7Port?: string | number
+  hl7Version?: string
+  pacsSystem?: string
+  pacsAETitle?: string
+  outstandingBalance?: number
+  billingStatus?: string
+}
+
+function asLoadedOrganization(value: Organization | null | undefined): LoadedOrganization | null {
+  if (!value) return null
+  return value as LoadedOrganization
+}
+
 export default function OrganizationSettingsPage() {
   const params = useParams()
   const router = useRouter()
@@ -46,15 +76,22 @@ export default function OrganizationSettingsPage() {
   const [confirmSaveOpen, setConfirmSaveOpen] = useState(false)
   const [formData, setFormData] = useState<any>(null)
   
-  // Fetch organization data
-  const { data: organization, isLoading } = useOrganization(organizationId)
-  const updateOrganization = useUpdateOrganization()
-  const testHL7 = useTestHL7()
+  // The query returns the API envelope. The form reads the organization inside it.
+  const { data: organizationResponse, isLoading } = useOrganization(organizationId)
+  const organization = asLoadedOrganization(organizationResponse?.data)
+  const updateOrganization = useUpdateOrganization(organizationId)
+  const testHL7 = useTestHL7Connection()
 
   // Seed the form once, when the organization first loads. Later query
   // updates must not overwrite fields the user has already edited.
   useEffect(() => {
     if (!organization) return
+
+    const address =
+      organization.address && typeof organization.address === 'object'
+        ? organization.address
+        : undefined
+    const hl7Settings = organization.hl7Settings
 
     setFormData((current: typeof formData) => {
       if (current) return current
@@ -66,16 +103,16 @@ export default function OrganizationSettingsPage() {
         contactName: organization.contact?.name || '',
         contactEmail: organization.email || organization.contact?.email || '',
         contactPhone: organization.phone || organization.contact?.phone || '',
-        street: organization.address?.street || '',
-        city: organization.address?.city || '',
-        state: organization.address?.state || '',
-        zip: organization.address?.zip || '',
+        street: address?.street || '',
+        city: address?.city || '',
+        state: address?.state || '',
+        zip: address?.zip || '',
         aeTitle: organization.aeTitle || '',
         datastoreId: organization.datastoreId || '',
         hl7InterfaceEnabled: organization.hl7InterfaceEnabled || false,
-        hl7Endpoint: organization.hl7Settings?.endpoint || '',
-        hl7Port: organization.hl7Settings?.port || '',
-        hl7Version: organization.hl7Settings?.version || '2.5',
+        hl7Endpoint: hl7Settings?.endpoint || organization.hl7Endpoint || '',
+        hl7Port: hl7Settings?.port || organization.hl7Port || '',
+        hl7Version: hl7Settings?.version || organization.hl7Version || '2.5',
         pacsSystem: organization.pacsSystem || '',
         pacsAETitle: organization.pacsAETitle || '',
       }
@@ -128,10 +165,7 @@ export default function OrganizationSettingsPage() {
       }
     }
 
-    await updateOrganization.mutateAsync({
-      id: organizationId,
-      data: updateData,
-    })
+    await updateOrganization.mutateAsync(updateData)
     
     setConfirmSaveOpen(false)
   }
