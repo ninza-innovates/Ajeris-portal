@@ -25,6 +25,7 @@ import {
   Receipt,
   MoreVertical
 } from 'lucide-react'
+import { invoiceMatchesPeriod } from '@/lib/billing/invoice-period'
 import { mockOrganizations } from '@/lib/mock-data/organizations'
 import type { Organization } from '@/types/organization'
 
@@ -174,8 +175,9 @@ export default function OrganizationBillingPage() {
       invoice.id.toLowerCase().includes(searchTerm.toLowerCase())
     
     const matchesStatus = filterStatus === 'all' || invoice.status === filterStatus
-    
-    return matchesSearch && matchesStatus
+    const matchesPeriod = invoiceMatchesPeriod(invoice.date, filterPeriod)
+
+    return matchesSearch && matchesStatus && matchesPeriod
   })
 
   const totalRevenue = mockInvoices
@@ -329,6 +331,9 @@ export default function OrganizationBillingPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {filteredInvoices.length === 0 && (
+                <p className="text-sm text-muted-foreground">No invoices match these filters.</p>
+              )}
               <div className="space-y-3">
                 {filteredInvoices.map((invoice) => (
                   <div key={invoice.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
