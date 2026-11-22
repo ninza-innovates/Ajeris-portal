@@ -3,6 +3,7 @@ import { API_CONFIG, buildApiUrl, API_ERROR_CODES, RATE_LIMIT_HEADERS } from './
 import { ApiResponse, ApiError } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { convertKeysSnakeToCamel, convertKeysCamelToSnake } from './utils/case-converter'
+import { resolvePaginationMeta } from './utils/pagination'
 import { mapApiUserToUser, mapApiStudyToStudy, mapApiRadiologistToRadiologist, mapApiOrganizationToOrganization } from './response-mappers'
 
 // Create axios instance
@@ -145,13 +146,10 @@ axiosInstance.interceptors.response.use(
           const paginatedData = {
             success: true,
             data: convertedDataArray,
-            meta: {
-              page: response.data.page || 1,
-              limit: response.data.items_per_page || response.data.limit || 10,
-              total: response.data.total_count || response.data.data.length,
-              hasMore: response.data.has_more || false,
-              totalPages: response.data.total_pages || Math.ceil((response.data.total_count || 0) / (response.data.items_per_page || 10))
-            }
+            meta: resolvePaginationMeta(response.data, {
+              defaultLimit: 10,
+              totalFallback: response.data.data.length,
+            }),
           }
           response.data = paginatedData
         } else {
