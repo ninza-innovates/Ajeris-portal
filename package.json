@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test src/lib/billing/invoice-period.test.ts"
+    "test": "tsx --test src/lib/billing/invoice-period.test.ts src/lib/api/utils/case-converter.test.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",
