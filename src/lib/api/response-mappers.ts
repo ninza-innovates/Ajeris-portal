@@ -21,6 +21,7 @@ import {
   DashboardStats,
   AdminMember 
 } from './types'
+import { resolvePaginationMeta } from './utils/pagination'
 
 /**
  * Maps API user response to our User type
@@ -292,20 +293,22 @@ export function mapPaginatedResponse<T>(
   
   // Handle different pagination formats
   const data = response.data || response.items || response.results || []
-  const meta = response.meta || response.pagination || {}
+  const items = Array.isArray(data) ? data : []
+  const meta = resolvePaginationMeta(response, {
+    defaultLimit: 20,
+    totalFallback: 0,
+  })
   
-  console.log('Extracted data array length:', Array.isArray(data) ? data.length : 'not an array');
+  console.log('Extracted data array length:', items.length);
   console.log('Meta object:', meta);
 
   const result = {
-    data: Array.isArray(data) ? data.map(itemMapper) : [],
+    data: items.map(itemMapper),
     meta: {
-      page: meta.page || meta.currentPage || 1,
-      limit: meta.limit || meta.pageSize || 20,
-      total: meta.total || meta.totalCount || 0,
-      hasMore: meta.hasMore !== undefined 
-        ? meta.hasMore 
-        : (meta.page * meta.limit < meta.total),
+      page: meta.page,
+      limit: meta.limit,
+      total: meta.total,
+      hasMore: meta.hasMore,
     },
   }
   
