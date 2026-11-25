@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { AuthService } from '@/lib/api/services/auth.service'
+import { readRefreshedSession } from '@/lib/api/refresh-session'
 import { toast } from '@/components/ui/use-toast'
 
 interface AdminUser {
@@ -21,7 +22,10 @@ interface AuthState {
   setUser: (user: AdminUser) => void
   setToken: (token: string, refreshToken?: string) => void
   checkAuth: () => boolean
+  refreshAccessToken: () => Promise<boolean>
 }
+
+let refreshInFlight: Promise<boolean> | null = null
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -111,7 +115,34 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: () => {
         const state = get()
         return state.isAuthenticated && !!state.token
-      }
+      },
+
+      refreshAccessToken: () => {
+        if (refreshInFlight) return refreshInFlight
+
+        refreshInFlight = (async () => {
+          const currentRefreshToken = get().refreshToken
+          if (!currentRefreshToken) return false
+
+          const response = await AuthService.refreshToken(currentRefreshToken)
+          // Logout clears the refresh token. Do not write a new session after that.
+          if (get().refreshToken !== currentRefreshToken) return false
+
+          const session = readRefreshedSession(response.success ? response.data : null)
+          if (!session) return false
+
+          set({
+            token: session.token,
+            refreshToken: session.refreshToken ?? currentRefreshToken,
+            isAuthenticated: true,
+          })
+          return true
+        })().finally(() => {
+          refreshInFlight = null
+        })
+
+        return refreshInFlight
+      },
     }),
     {
       name: 'ajeris-admin-auth',

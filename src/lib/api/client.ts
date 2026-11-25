@@ -4,6 +4,7 @@ import { ApiResponse, ApiError } from './types'
 import { useAuthStore } from '@/stores/auth-store'
 import { convertKeysSnakeToCamel, convertKeysCamelToSnake } from './utils/case-converter'
 import { resolvePaginationMeta } from './utils/pagination'
+import { isAuthRefreshRequest } from './refresh-session'
 import { mapApiUserToUser, mapApiStudyToStudy, mapApiRadiologistToRadiologist, mapApiOrganizationToOrganization } from './response-mappers'
 
 // Create axios instance
@@ -20,7 +21,8 @@ axiosInstance.interceptors.request.use(
   (config) => {
     // Add auth token
     const token = useAuthStore.getState().token
-    if (token) {
+    // The refresh call must not send the expired access token.
+    if (token && !isAuthRefreshRequest(config.url)) {
       config.headers.Authorization = `Bearer ${token}`
     }
 
@@ -224,7 +226,11 @@ axiosInstance.interceptors.response.use(
     // All error response mocks have been removed - endpoints should return proper data
 
     // Handle 401 Unauthorized
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthRefreshRequest(originalRequest.url)
+    ) {
       originalRequest._retry = true
 
       try {
