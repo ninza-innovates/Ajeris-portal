@@ -63,21 +63,20 @@ export default function OrganizationsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null)
 
-  // Fetch organizations with filters
-  const { data: organizationsData, isLoading, error } = useOrganizations({
+  // useOrganizations returns the mapped list, not an { data } envelope.
+  const { data: organizationRows = [], isLoading, error } = useOrganizations({
     page: 1,
     limit: 100,
     search: searchQuery || undefined,
     status: filterStatus !== 'all' ? filterStatus as any : undefined,
     type: filterType !== 'all' ? filterType : undefined,
   })
+  const organizations = organizationRows as Organization[]
 
   const { data: stats, isLoading: statsLoading } = useOrganizationStats()
   const suspendMutation = useSuspendOrganization()
   const activateMutation = useActivateOrganization()
   const deleteMutation = useDeleteOrganization()
-
-  const organizations = organizationsData?.data || []
 
   const statsData = useMemo(() => [
     {
@@ -292,15 +291,6 @@ export default function OrganizationsPage() {
               </CardContent>
             </Card>
           ))
-        ) : error ? (
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center gap-2 text-red-600">
-                <AlertCircle className="h-5 w-5" />
-                <p>Failed to load organizations: {error.message}</p>
-              </div>
-            </CardContent>
-          </Card>
         ) : organizations.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center">
