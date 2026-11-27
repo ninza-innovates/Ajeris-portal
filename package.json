@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test src/lib/billing/invoice-period.test.ts src/lib/api/utils/pagination.test.ts scripts/openapi-document.test.ts src/lib/api/utils/case-converter.test.ts src/lib/api/refresh-session.test.ts"
+    "test": "tsx --test src/lib/billing/invoice-period.test.ts src/lib/api/utils/pagination.test.ts scripts/openapi-document.test.ts src/lib/api/utils/case-converter.test.ts src/lib/api/refresh-session.test.ts src/lib/api/login-session.test.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.10",

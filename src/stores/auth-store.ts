@@ -40,26 +40,21 @@ export const useAuthStore = create<AuthState>()(
           const response = await AuthService.login({ email, password })
           
           if (response.success && response.data) {
-            // Backend returns access_token, not token
-            const accessToken = response.data.token || (response.data as any).access_token
-            const tokenType = (response.data as any).token_type || 'Bearer'
-            
-            // For admin login, user data might be minimal or need to be fetched separately
-            const userData = response.data.user || {
-              id: '1',
-              email: email,
-              name: email.split('@')[0], // Use email prefix as name if not provided
-              role: 'ADMIN' as const,
-              avatar: null
+            // The client maps access_token onto token. Some payloads still use access_token.
+            const accessToken = response.data.token || (response.data as { access_token?: string }).access_token
+            if (!accessToken) {
+              throw new Error('Login failed')
             }
+            const signedIn = response.data.user
+            const name = signedIn?.name || email.split('@')[0] || email
             
             set({
               user: {
-                id: userData.id,
-                email: userData.email,
-                name: userData.name,
-                role: userData.role,
-                avatar: userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}`
+                id: signedIn?.id || '1',
+                email: signedIn?.email || email,
+                name,
+                role: signedIn?.role ?? 'ADMIN',
+                avatar: signedIn?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}`
               },
               token: accessToken,
               refreshToken: response.data.refreshToken || null,
@@ -68,7 +63,7 @@ export const useAuthStore = create<AuthState>()(
             
             toast({
               title: 'Welcome back!',
-              description: `Logged in as ${userData.name}`,
+              description: `Logged in as ${name}`,
             })
           } else {
             throw new Error(response.error?.message || 'Login failed')
