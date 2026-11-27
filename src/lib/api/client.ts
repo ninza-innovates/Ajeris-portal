@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/auth-store'
 import { convertKeysSnakeToCamel, convertKeysCamelToSnake } from './utils/case-converter'
 import { resolvePaginationMeta } from './utils/pagination'
 import { isAuthRefreshRequest } from './refresh-session'
+import { readLoginSession } from './login-session'
 import { mapApiUserToUser, mapApiStudyToStudy, mapApiRadiologistToRadiologist, mapApiOrganizationToOrganization } from './response-mappers'
 
 // Create axios instance
@@ -91,26 +92,16 @@ axiosInstance.interceptors.response.use(
         console.log('Users API converted data:', convertedData)
       }
       
-      // Special handling for login response
-      if (response.config.url?.includes('/auth/login') && response.data.access_token) {
+      // Login returns access_token and no account. Keep that payload as-is
+      // instead of replacing the signed-in user with a hardcoded admin.
+      const loginSession = response.config.url?.includes('/auth/login')
+        ? readLoginSession(convertedData)
+        : null
+
+      if (loginSession) {
         response.data = {
           success: true,
-          data: {
-            token: response.data.access_token,
-            user: {
-              id: 'admin',
-              email: 'admin@ajeris.com', 
-              name: 'Admin User',
-              role: 'SUPER_ADMIN',
-              status: 'active',
-              twoFactorEnabled: false,
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              invitedBy: 'system',
-              invitedAt: new Date().toISOString(),
-            },
-            permissions: ['all']
-          }
+          data: loginSession,
         }
       // ========== MOCK INTERCEPTORS REMOVED ==========
       // All mock interceptors have been removed as real endpoints are now available

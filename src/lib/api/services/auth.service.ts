@@ -5,8 +5,8 @@ import { ApiResponse, LoginRequest, AdminMember } from '../types'
 export interface LoginResponse {
   token: string
   refreshToken?: string
-  user: AdminMember
-  permissions: string[]
+  user?: Pick<AdminMember, 'id' | 'email' | 'name' | 'role'> & { avatar?: string }
+  permissions?: string[]
 }
 
 export class AuthService {

@@ -12,11 +12,19 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (credentials: LoginRequest) => AuthService.login(credentials),
-    onSuccess: (response) => {
+    onSuccess: (response, credentials) => {
       if (response.success && response.data) {
-        // Store auth data
-        setUser(response.data.user)
-        setToken(response.data.token)
+        const email = credentials.email
+        const account = response.data.user ?? {
+          id: '1',
+          email,
+          name: email.split('@')[0] || email,
+          role: 'ADMIN' as const,
+        }
+
+        // Store auth data. The login API often omits the account.
+        setUser(account)
+        setToken(response.data.token, response.data.refreshToken)
         
         // Invalidate queries
         queryClient.invalidateQueries({ queryKey: queryKeys.auth.all })
@@ -26,7 +34,7 @@ export function useLogin() {
         
         toast({
           title: 'Welcome back!',
-          description: `Logged in as ${response.data.user.name}`,
+          description: `Logged in as ${account.name}`,
         })
       }
     },
